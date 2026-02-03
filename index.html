@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abyssal Puzzle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Base & Reset --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background-color: #5c5083;
+            color: #f0f8ff;
+            font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        /* --- Loading Animation --- */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #5c5083;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        #loader-status-text {
+            color: #a6adc8;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: fadeInStatus 1s forwards;
+        }
+        
+        @keyframes fadeInStatus {
+            to { opacity: 1; }
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* --- Particle Background --- */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        /* --- Main Content --- */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 25vh;
+            height: 100vh;
+            opacity: 0;
+            animation: fadeInContent 2s 0.5s forwards;
+        }
+        @keyframes fadeInContent { to { opacity: 1; } }
+
+        .site-title {
+            font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            margin-bottom: 60px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .site-title {
+                font-size: 2rem;
+                letter-spacing: 4px;
+            }
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .btn {
+                width: 200px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loader">
+        <p id="loader-status-text"></p>
+    </div>
+    
+    <div id="particles-js"></div>
+
+    <div class="main-container">
+        <h1 class="site-title">Abyssal Puzzle</h1>
+        <div class="button-group">
+            <a href="https://docs.abyssal-puzzle.top" class="btn" target="_blank">文档</a>
+            <a href="https://github.com/abyssal-puzzle-team" class="btn" target="_blank">Github</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.9.3/tsparticles.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. 加载动画 ---
+            (async () => {
+                const loader = document.getElementById('loader');
+                const statusText = document.getElementById('loader-status-text');
+                statusText.textContent = '正在加载……';
+                setTimeout(() => loader.classList.add('hidden'), 500);
+            })();
+
+            // --- 2. 粒子效果初始化 ---
+            tsParticles.load("particles-js", {
+                fpsLimit: 60,
+                particles: {
+                    number: { value: 120, density: { enable: true, value_area: 800 } },
+                    color: { value: "#ffffff" },
+                    shape: { type: "circle" },
+                    opacity: { value: { min: 0.3, max: 0.8 }, animation: { enable: true, speed: 1, sync: false } },
+                    size: { value: { min: 1, max: 4 } },
+                    move: { enable: true, speed: 2, direction: "bottom", straight: false, out_mode: "out" }
+                },
+                interactivity: {
+                    events: { onhover: { enable: true, mode: "repulse" }, resize: true },
+                    modes: { repulse: { distance: 100, duration: 0.4 } }
+                },
+                detectRetina: true
+            });
+        });
+    </script>
+</body>
+</html>
