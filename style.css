@@ -1,0 +1,307 @@
+/* --- Base & Reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background-color: #050505; /* 与 home.vue 保持一致 */
+    color: #fff; /* 与 home.vue 保持一致 */
+    font-family: 'Inter', sans-serif; /* 引入 Inter 字体 */
+    cursor: none; /* 隐藏默认光标 */
+}
+
+/* 移动端显示默认光标 */
+@media (pointer: coarse), (max-width: 768px) {
+    html, body {
+        cursor: auto;
+    }
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+/* --- Loading Animation --- */
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #050505; /* 与 home.vue 背景色一致 */
+    z-index: 9999;
+    display: flex;
+    flex-direction: column; /* 垂直排列进度条和文本 */
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.8s ease-out, visibility 0.8s ease-out; /* 改变 transition 属性 */
+    transform: translateY(0); /* 初始位置 */
+}
+
+#loader-status-text {
+    color: #666; /* 与 hero-label 颜色一致 */
+    font-size: 1rem;
+    letter-spacing: 2px;
+    opacity: 1; /* 初始可见，由 JS 控制显示 */
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 20px; /* 位于进度条下方 */
+}
+
+#loader-progress-bar-container {
+    width: 200px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+#loader-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #fff;
+    transition: width 0.5s ease-out;
+}
+
+#loader.hidden {
+    transform: translateY(-100%); /* 向上移动隐藏 */
+    visibility: hidden;
+}
+
+/* Geometry Background Styles */
+.geometry-wrapper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #050505;
+    z-index: 0; /* 放在最底层 */
+}
+
+.geometry-wrapper canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
+    pointer-events: none;
+    z-index: 1; /* 在 Canvas 之上 */
+}
+
+/* 噪点层 */
+.overlay-noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2; /* 在 Canvas 和 Vignette 之上 */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* 光标样式 */
+#cursor-dot,
+#cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    will-change: transform;
+}
+
+#cursor-dot {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    margin-left: -3px;
+    margin-top: -3px;
+}
+
+#cursor-ring {
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    margin-left: -15px;
+    margin-top: -15px;
+    transition: width 0.2s, height 0.2s, background-color 0.2s;
+}
+
+#cursor-ring.hovered {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: transparent;
+    margin-left: -25px;
+    margin-top: -25px;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* 确保在噪点和背景之上 */
+}
+
+.hero-content {
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero-label {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.8s ease;
+    display: block;
+    margin-bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.hero-label.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 8vw, 7rem);
+    font-weight: 800;
+    letter-spacing: -3px;
+    mix-blend-mode: difference;
+    margin-bottom: 40px;
+    line-height: 1.1;
+}
+
+.hero-actions {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: 0.8s ease 0.3s;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.hero-actions.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.main-btn {
+    padding: 20px 50px;
+    background: #fff;
+    color: #000;
+    border: none;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+@media (hover: hover) {
+    .main-btn:hover {
+        transform: scale(1.05);
+    }
+}
+
+/* Footer */
+.footer-info {
+    position: absolute;
+    bottom: 40px;
+    width: 100%;
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #444;
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 100;
+}
+
+.dud {
+    color: #757575;
+}
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: flex-end; /* 恢复为 flex-end，因为 logo 独立定位 */
+            align-items: center;
+            z-index: 50; /* 在内容之上，光标之下 */
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .navbar.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .navbar-logo {
+            position: absolute; /* 绝对定位 */
+            top: 20px; /* 距离顶部 20px */
+            left: 60px; /* 距离左侧 60px */
+            z-index: 60; /* 确保在导航栏之上 */
+        }
+
+        .navbar-logo img {
+            height: 30px; /* 调整 logo 大小 */
+            width: auto;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .footer-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                padding: 0 20px;
+                bottom: 20px;
+                display: flex;
+                text-align: center;
+            }
+            .hero-title {
+                font-size: 2rem;
+                letter-spacing: -1px;
+            }
+            .hero-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .main-btn {
+                width: 200px;
+                text-align: center;
+            }
+            .navbar {
+                padding: 20px;
+                justify-content: center;
+            }
+            .navbar-links {
+                display: none; /* 隐藏导航栏链接 */
+            }
+            .navbar-logo {
+                position: absolute;
+                left: 20px;
+                top: 20px;
+            }
+        }
