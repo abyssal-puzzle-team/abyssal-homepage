@@ -27,6 +27,20 @@ a {
     cursor: pointer;
 }
 
+/* Top Left Logo */
+#top-left-logo {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+#top-left-logo img {
+    height: 40px; /* Adjust logo size as needed */
+    width: auto;
+    display: block;
+}
+
 /* --- Loading Animation --- */
 #loader {
     position: fixed;
